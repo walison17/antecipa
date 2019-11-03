@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     'antecipa.accounts',
     'antecipa.companies',
+    'antecipa.payments',
 ]
 
 MIDDLEWARE = [
