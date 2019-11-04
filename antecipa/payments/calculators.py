@@ -2,7 +2,7 @@ from decimal import Decimal
 from datetime import date
 
 
-class AntecipationCalcutor:
+class AnticipationCalcutor:
     MONTHLY_PERCENTAGE = 0.03
 
     def __init__(self, payment):

@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Antecipation',
+            name='Anticipation',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
@@ -49,18 +49,18 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='AntecipationHistory',
+            name='AnticipationHistory',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('status', models.CharField(choices=[('WAITING', 'Aguardando confirmação'), ('CONFIRMED', 'Antecipado'), ('DENIED', 'Negado')], max_length=1, verbose_name='Situação')),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='Criado em')),
-                ('antecipation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='history', to='payments.Antecipation', verbose_name='Antecipação')),
+                ('anticipation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='history', to='payments.Anticipation', verbose_name='Antecipação')),
             ],
             options={
                 'verbose_name': 'histórico de antecipação',
                 'verbose_name_plural': 'históricos de antecipações',
                 'ordering': ['-created'],
-                'unique_together': {('antecipation', 'status')},
+                'unique_together': {('anticipation', 'status')},
             },
         ),
     ]

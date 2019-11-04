@@ -5,16 +5,16 @@ from django.test import TestCase
 from model_bakery import baker
 from freezegun import freeze_time
 
-from ..calculators import AntecipationCalcutor
+from ..calculators import AnticipationCalcutor
 
 
 @freeze_time('2019-9-15')
-class TestAntecipationCalculator(TestCase):
+class TestAnticipationCalculator(TestCase):
     def setUp(self):
         payment = baker.make(
             'payments.Payment', value=Decimal(1000), due_date=date(2019, 10, 1)
         )
-        self.calculator = AntecipationCalcutor(payment)
+        self.calculator = AnticipationCalcutor(payment)
 
     def test_diff_in_days(self):
         diff = self.calculator._diff_in_days()

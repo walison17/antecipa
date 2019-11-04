@@ -5,54 +5,54 @@ from django.test import TestCase
 from model_bakery import baker
 from freezegun import freeze_time
 
-from ..models import Antecipation, Payment
+from ..models import Anticipation, Payment
 
 
 @freeze_time('2019-9-15')
-class TestAntecipationModel(TestCase):
+class TestAnticipationModel(TestCase):
     def setUp(self):
         self.payment = baker.make(
             'payments.Payment', value=Decimal(1000), due_date=date(2019, 10, 1)
         )
-        self.antecipation = baker.make(Antecipation, payment=self.payment)
+        self.anticipation = baker.make(Anticipation, payment=self.payment)
 
     def test_calculate_value_on_save(self):
-        self.assertEqual(self.antecipation.value, Decimal(984.00))
-        self.assertEqual(self.antecipation.status, Antecipation.WAITING)
+        self.assertEqual(self.anticipation.value, Decimal(984.00))
+        self.assertEqual(self.anticipation.status, Anticipation.WAITING)
 
     def test_confirm(self):
-        self.antecipation.confirm()
+        self.anticipation.confirm()
 
-        self.antecipation.refresh_from_db()
-        self.assertEqual(self.antecipation.status, Antecipation.CONFIRMED)
+        self.anticipation.refresh_from_db()
+        self.assertEqual(self.anticipation.status, Anticipation.CONFIRMED)
 
     def test_deny(self):
-        self.antecipation.deny()
+        self.anticipation.deny()
 
-        self.antecipation.refresh_from_db()
-        self.assertEqual(self.antecipation.status, Antecipation.DENIED)
+        self.anticipation.refresh_from_db()
+        self.assertEqual(self.anticipation.status, Anticipation.DENIED)
 
 
-class TestAntecipationHistoryModel(TestCase):
-    def test_must_create_when_antecipation_is_created(self):
-        antecipation = baker.make(Antecipation)
+class TestAnticipationHistoryModel(TestCase):
+    def test_must_create_when_anticipation_is_created(self):
+        anticipation = baker.make(Anticipation)
 
-        self.assertEqual(antecipation.history.count(), 1)
+        self.assertEqual(anticipation.history.count(), 1)
 
-    def test_must_create_when_antecipation_status_changed(self):
-        antecipation = baker.make(Antecipation)
+    def test_must_create_when_anticipation_status_changed(self):
+        anticipation = baker.make(Anticipation)
 
-        antecipation.confirm()
+        anticipation.confirm()
 
-        self.assertEqual(antecipation.history.count(), 2)
+        self.assertEqual(anticipation.history.count(), 2)
 
     def test_not_duplicate_status_history(self):
-        antecipation = baker.make(Antecipation)
+        anticipation = baker.make(Anticipation)
 
-        antecipation.status = Antecipation.WAITING
-        antecipation.save(update_fields=['status'])
+        anticipation.status = Anticipation.WAITING
+        anticipation.save(update_fields=['status'])
 
-        self.assertEqual(antecipation.history.count(), 1)
+        self.assertEqual(anticipation.history.count(), 1)
 
 
 @freeze_time('2019-11-15')

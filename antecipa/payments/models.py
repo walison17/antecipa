@@ -7,14 +7,14 @@ from django.dispatch.dispatcher import receiver
 
 from model_utils.models import TimeStampedModel
 
-from .calculators import AntecipationCalcutor
+from .calculators import AnticipationCalcutor
 
 
 class PaymentQuerySet(models.QuerySet):
     def with_status(self):
         return self.annotate(
             status=Case(
-                When(Q(antecipation__isnull=False), then=F('antecipation__status')),
+                When(Q(anticipation__isnull=False), then=F('anticipation__status')),
                 When(Q(due_date__lte=date.today()), then=Value('UNAVAILABLE')),
                 default=Value('AVAILABLE'),
                 output_field=models.CharField()
@@ -43,7 +43,7 @@ class Payment(TimeStampedModel):
         return f'ID: {self.pk} @ {self.company}'
 
 
-class Antecipation(TimeStampedModel):
+class Anticipation(TimeStampedModel):
     WAITING = 'WAITING'
     CONFIRMED = 'CONFIRMED'
     DENIED = 'DENIED'
@@ -57,7 +57,7 @@ class Antecipation(TimeStampedModel):
         Payment,
         verbose_name='Pagamento',
         on_delete=models.CASCADE,
-        limit_choices_to=Q(due_date__gt=date.today()) & Q(antecipation__isnull=True)
+        limit_choices_to=Q(due_date__gt=date.today()) & Q(anticipation__isnull=True)
     )
     value = models.DecimalField('Valor antecipado', max_digits=9, decimal_places=2, editable=False)
     status = models.CharField(
@@ -76,7 +76,7 @@ class Antecipation(TimeStampedModel):
         )
 
     def save(self, *args, **kwargs):
-        calculator = AntecipationCalcutor(self.payment)
+        calculator = AnticipationCalcutor(self.payment)
         self.value = calculator.calculate()
         return super().save(*args, **kwargs)
 
@@ -89,11 +89,11 @@ class Antecipation(TimeStampedModel):
         self.save(update_fields=['status'])
 
 
-class AntecipationHistory(models.Model):
-    status = models.CharField('Situação', max_length=20, choices=Antecipation.STATUSES)
+class AnticipationHistory(models.Model):
+    status = models.CharField('Situação', max_length=20, choices=Anticipation.STATUSES)
     created = models.DateTimeField('Criado em', auto_now_add=True, editable=False)
-    antecipation = models.ForeignKey(
-        Antecipation,
+    anticipation = models.ForeignKey(
+        Anticipation,
         verbose_name='Antecipação',
         related_name='history',
         on_delete=models.CASCADE
@@ -103,13 +103,13 @@ class AntecipationHistory(models.Model):
         verbose_name = 'histórico de antecipação'
         verbose_name_plural = 'históricos de antecipações'
         ordering = ['-created']
-        unique_together = ['antecipation', 'status']
+        unique_together = ['anticipation', 'status']
 
     def __str__(self):
-        return f'Antecipação: {self.antecipation.pk}, status: {self.get_status_display()}'
+        return f'Antecipação: {self.anticipation.pk}, status: {self.get_status_display()}'
 
 
-@receiver(post_save, sender=Antecipation)
-def update_antecipation_history(sender, instance, **kwargs):
+@receiver(post_save, sender=Anticipation)
+def update_anticipation_history(sender, instance, **kwargs):
     if not instance.history.filter(status=instance.status).exists():
         instance.history.create(status=instance.status)

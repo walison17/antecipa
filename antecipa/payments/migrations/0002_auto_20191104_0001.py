@@ -13,17 +13,17 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='antecipation',
+            model_name='anticipation',
             name='payment',
-            field=models.OneToOneField(limit_choices_to=models.Q(('due_date__gt', datetime.date(2019, 11, 4)), ('antecipation__isnull', True)), on_delete=django.db.models.deletion.CASCADE, to='payments.Payment', verbose_name='Pagamento'),
+            field=models.OneToOneField(limit_choices_to=models.Q(('due_date__gt', datetime.date(2019, 11, 4)), ('anticipation__isnull', True)), on_delete=django.db.models.deletion.CASCADE, to='payments.Payment', verbose_name='Pagamento'),
         ),
         migrations.AlterField(
-            model_name='antecipation',
+            model_name='anticipation',
             name='status',
             field=models.CharField(choices=[('WAITING', 'Aguardando confirmação'), ('CONFIRMED', 'Antecipado'), ('DENIED', 'Negado')], default='WAITING', editable=False, max_length=20, verbose_name='Situação'),
         ),
         migrations.AlterField(
-            model_name='antecipationhistory',
+            model_name='anticipationhistory',
             name='status',
             field=models.CharField(choices=[('WAITING', 'Aguardando confirmação'), ('CONFIRMED', 'Antecipado'), ('DENIED', 'Negado')], max_length=20, verbose_name='Situação'),
         ),
