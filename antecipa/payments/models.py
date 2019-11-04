@@ -53,9 +53,16 @@ class Antecipation(TimeStampedModel):
         (DENIED, 'Negado')
     )
 
-    payment = models.OneToOneField(Payment, verbose_name='Pagamento', on_delete=models.CASCADE)
+    payment = models.OneToOneField(
+        Payment,
+        verbose_name='Pagamento',
+        on_delete=models.CASCADE,
+        limit_choices_to=Q(due_date__gt=date.today()) & Q(antecipation__isnull=True)
+    )
     value = models.DecimalField('Valor antecipado', max_digits=9, decimal_places=2, editable=False)
-    status = models.CharField('Situação', max_length=20, choices=STATUSES, default=WAITING)
+    status = models.CharField(
+        'Situação', max_length=20, choices=STATUSES, default=WAITING, editable=False
+    )
 
     class Meta:
         verbose_name = 'antecipação'
@@ -83,7 +90,7 @@ class Antecipation(TimeStampedModel):
 
 
 class AntecipationHistory(models.Model):
-    status = models.CharField('Situação', max_length=1, choices=Antecipation.STATUSES)
+    status = models.CharField('Situação', max_length=20, choices=Antecipation.STATUSES)
     created = models.DateTimeField('Criado em', auto_now_add=True, editable=False)
     antecipation = models.ForeignKey(
         Antecipation,
