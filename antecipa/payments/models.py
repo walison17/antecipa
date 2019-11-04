@@ -1,10 +1,25 @@
+from datetime import date
+
 from django.db import models
+from django.db.models import Case, When, Value, Q, F
 from django.db.models.signals import post_save
 from django.dispatch.dispatcher import receiver
 
 from model_utils.models import TimeStampedModel
 
 from .calculators import AntecipationCalcutor
+
+
+class PaymentQuerySet(models.QuerySet):
+    def with_status(self):
+        return self.annotate(
+            status=Case(
+                When(Q(antecipation__isnull=False), then=F('antecipation__status')),
+                When(Q(due_date__lte=date.today()), then=Value('UNAVAILABLE')),
+                default=Value('AVAILABLE'),
+                output_field=models.CharField()
+            )
+        )
 
 
 class Payment(TimeStampedModel):
@@ -16,6 +31,8 @@ class Payment(TimeStampedModel):
         related_name='payments',
         on_delete=models.PROTECT
     )
+
+    objects = PaymentQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'pagamento'

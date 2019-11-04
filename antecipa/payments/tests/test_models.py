@@ -5,7 +5,7 @@ from django.test import TestCase
 from model_bakery import baker
 from freezegun import freeze_time
 
-from ..models import Antecipation
+from ..models import Antecipation, Payment
 
 
 @freeze_time('2019-9-15')
@@ -53,3 +53,19 @@ class TestAntecipationHistoryModel(TestCase):
         antecipation.save(update_fields=['status'])
 
         self.assertEqual(antecipation.history.count(), 1)
+
+
+@freeze_time('2019-11-15')
+class TestPaymentManager(TestCase):
+    def setUp(self):
+        self.company = baker.make('companies.Company')
+
+    def test_annotate_available_status(self):
+        baker.make('payments.Payment', company=self.company, due_date=date(2019, 11, 30))
+
+        self.assertQuerysetEqual(Payment.objects.with_status(), ['AVAILABLE'], lambda p: p.status)
+
+    def test_annotate_unavailable_status(self):
+        baker.make('payments.Payment', company=self.company, due_date=date(2019, 11, 1))
+
+        self.assertQuerysetEqual(Payment.objects.with_status(), ['UNAVAILABLE'], lambda p: p.status)
