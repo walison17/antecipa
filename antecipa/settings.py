@@ -14,6 +14,10 @@ import os
 
 from decouple import config, Csv
 from dj_database_url import parse as db_url
+from django.conf.locale.pt_BR import formats
+
+formats.DATETIME_FORMAT = "d/m/Y à\\s H:i"
+formats.DATE_FORMAT = "d/m/Y"
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

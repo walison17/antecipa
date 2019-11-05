@@ -28,6 +28,7 @@ class Payment(TimeStampedModel):
     due_date = models.DateField('Data de vencimento')
     company = models.ForeignKey(
         'companies.Company',
+        verbose_name='Empresa',
         related_name='payments',
         on_delete=models.PROTECT
     )
